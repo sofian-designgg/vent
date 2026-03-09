@@ -1,0 +1,12 @@
+{
+  "token": "TON_TOKEN_DISCORD_ICI",
+  "channel_id": 1234567890123456789,
+  "roles": {
+    "5_wins": 1234567890123456789,
+    "10_wins": 1234567890123456789,
+    "20_wins": 1234567890123456789,
+    "50_wins": 1234567890123456789
+  },
+  "interval_minutes": 20,
+  "words_file": "words.txt"
+}
