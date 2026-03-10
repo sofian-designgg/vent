@@ -1,0 +1,3 @@
+# Installer les polices pour la génération d'images (Railway)
+[phases.setup]
+aptPkgs = ["fonts-dejavu-core"]

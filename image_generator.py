@@ -2,13 +2,17 @@
 Générateur d'images pour les mini-événements du chat.
 Style : fond sombre avec points lumineux, mot en GROS et bien visible au centre.
 """
+import io
 import random
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 
+# Dossier du script pour police locale
+_SCRIPT_DIR = Path(__file__).resolve().parent
 
-def generate_word_image(word: str, output_path: str) -> str:
+
+def generate_word_image(word: str, output_path: str = None) -> bytes:
     """Génère une image avec le mot affiché en grand et très lisible sur fond étoilé."""
     width, height = 900, 350
     img = Image.new("RGB", (width, height), color=(20, 30, 50))
@@ -26,11 +30,22 @@ def generate_word_image(word: str, output_path: str) -> str:
     # Taille de police BEAUCOUP plus grande et bien lisible
     font_size = 120
     font_paths = [
+        # Police locale (priorité - ajoute fonts/DejaVuSans-Bold.ttf si besoin)
+        str(_SCRIPT_DIR / "fonts" / "DejaVuSans-Bold.ttf"),
+        str(_SCRIPT_DIR / "fonts" / "DejaVuSans.ttf"),
+        str(_SCRIPT_DIR / "fonts" / "LiberationSans-Bold.ttf"),
+        str(_SCRIPT_DIR / "fonts" / "font.ttf"),
+        # Linux (Railway, Docker)
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
+        "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+        "/usr/share/fonts/truetype/freefont/FreeSansBold.ttf",
+        # Windows
         "C:/Windows/Fonts/arialbd.ttf",
         "C:/Windows/Fonts/arial.ttf",
         "C:/Windows/Fonts/segoeui.ttf",
-        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
-        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        # macOS
         "/System/Library/Fonts/Helvetica.ttc",
     ]
 
@@ -61,6 +76,14 @@ def generate_word_image(word: str, output_path: str) -> str:
     # Texte principal blanc bien visible
     draw.text((x, y), word, font=font, fill=(255, 255, 255))
 
-    Path(output_path).parent.mkdir(parents=True, exist_ok=True)
-    img.save(output_path)
-    return output_path
+    # Envoyer en mémoire (évite problèmes de fichiers sur Railway)
+    buffer = io.BytesIO()
+    img.save(buffer, format="PNG")
+    buffer.seek(0)
+    png_bytes = buffer.getvalue()
+
+    if output_path:
+        Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+        with open(output_path, "wb") as f:
+            f.write(png_bytes)
+    return png_bytes

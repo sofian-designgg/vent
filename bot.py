@@ -6,6 +6,7 @@ Rôles à 5, 10, 20 et 50 victoires.
 Déploiement Railway : utilise DISCORD_TOKEN, CHANNEL_ID, MONGO_URL en variables d'env.
 """
 import asyncio
+import io
 import json
 import os
 import random
@@ -109,15 +110,14 @@ async def run_mini_event(channel: discord.TextChannel):
             "winner_event": winner_event,
         }
 
-    image_path = f"data/current_word.png"
-    generate_word_image(word, image_path)
+    image_bytes = generate_word_image(word)
 
     embed = discord.Embed(
         title="Tape le mot dans l'image. Le plus rapide gagne !",
         color=discord.Color.blue(),
     )
     embed.set_image(url="attachment://word.png")
-    file = discord.File(image_path, filename="word.png")
+    file = discord.File(fp=io.BytesIO(image_bytes), filename="word.png")
 
     await channel.send(embed=embed, file=file)
 
